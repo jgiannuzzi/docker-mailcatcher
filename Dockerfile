@@ -18,6 +18,14 @@ RUN set -ex \
  && apk add --no-cache --virtual .mailcatcher-rundeps $runDeps \
  && apk del --no-cache .build-deps
 
+COPY patches /tmp/patches
+RUN cd /usr/local/bundle/gems/mailcatcher-* \
+ && for diff in /tmp/patches/*.diff; do patch -p1 < $diff; done \
+ && rm -rf /tmp/patches
+
+VOLUME /data
+WORKDIR /data
+
 EXPOSE 1025 1080
 
 CMD ["mailcatcher", "--foreground", "--no-quit", "--ip", "0.0.0.0"]
